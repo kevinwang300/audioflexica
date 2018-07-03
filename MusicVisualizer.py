@@ -85,8 +85,8 @@ class Terrain(object):
             for n in range(self.nfaces - 1):
                 faces.append([n + yoff, yoff + n + self.nfaces, yoff + n + self.nfaces + 1])
                 faces.append([n + yoff, yoff + n + 1, yoff + n + self.nfaces + 1])
-                colors.append([n / self.nfaces, 1 - n / self.nfaces, m / self.nfaces, 0.7])
-                colors.append([n / self.nfaces, 1 - n / self.nfaces, m / self.nfaces, 0.8])
+                colors.append([float(n) / float(self.nfaces), float(1 - n) / float(self.nfaces), float(1 - m) / float(self.nfaces), 0.7])
+                colors.append([float(n) / float(self.nfaces), float(1 - n) / float(self.nfaces), float(1 - m) / float(self.nfaces), 0.8])
 
         faces = np.array(faces, dtype=np.uint32)
         colors = np.array(colors, dtype=np.float32)

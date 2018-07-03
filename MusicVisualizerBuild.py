@@ -3,6 +3,8 @@ from pyqtgraph.Qt import QtCore, QtGui
 import pyqtgraph.opengl as gl
 import sys
 from opensimplex import OpenSimplex
+import wave
+import pyaudio
 
 class Terrain(object):
     def __init__(self):
@@ -13,12 +15,17 @@ class Terrain(object):
         # setup the view window
         self.app = QtGui.QApplication(sys.argv)
         self.w = gl.GLViewWidget()
-        self.w.setGeometry(500, 1000, 1280, 800)
-        print(self.w.width(), self.w.rect())
+        # self.w.setGeometry(0, 0, 1280, 800)
+        print(1, self.w.width(), self.w.height())
         # self.w.resizeGL(1080, 720)
+        # self.w.resizeGL(2000, 1100)
         self.w.show()
         self.w.setWindowTitle('Terrain')
-        self.w.setCameraPosition(distance=30, elevation=8)
+        self.w.setCameraPosition(pos=(0,0,0), distance=200, elevation=30)
+        self.w.setGeometry(0, 0, 1280, 800)
+        self.w.pan(-70, -15, 0)
+        self.w.opts['viewport'] =  (0, 0, 2560, 1600)
+        # self.w.setFixedSize(WidthOfParent, HeightOfParent)
         
         # constants and arrays
         self.nsteps = 1
@@ -35,7 +42,7 @@ class Terrain(object):
         # create the veritices array
         verts = np.array([
             [
-                x, y, 1.5 * self.tmp.noise2d(x=n / self.smoothness, y=m / self.smoothness)
+                x, y, 1.5 * self.tmp.noise2d(x=float(n) / float(self.smoothness), y=float(m) / float(self.smoothness))
             ] for n, x in enumerate(self.xpoints) for m, y in enumerate(self.ypoints)
         ], dtype=np.float32)
 
@@ -63,8 +70,10 @@ class Terrain(object):
         self.w.addItem(self.m1)
         
         grid = gl.GLGridItem()
+        # grid.setSize(10, 10, 10)
         grid.scale(2, 2, 2)
         self.w.addItem(grid)
+        print(grid.size())
         
     def update(self):
         """
@@ -72,7 +81,7 @@ class Terrain(object):
         """
         verts = np.array([
             [
-                x, y, 2.5 * self.tmp.noise2d(x=n / self.smoothness + self.offset, y=m / self.smoothness + self.offset)
+                x, y, 2.5 * self.tmp.noise2d(x=n / 3 + self.offset, y=m / 3 + self.offset)
             ] for n, x in enumerate(self.xpoints) for m, y in enumerate(self.ypoints)
         ], dtype=np.float32)
 
@@ -83,8 +92,10 @@ class Terrain(object):
             for n in range(self.nfaces - 1):
                 faces.append([n + yoff, yoff + n + self.nfaces, yoff + n + self.nfaces + 1])
                 faces.append([n + yoff, yoff + n + 1, yoff + n + self.nfaces + 1])
-                colors.append([self.colorVal, self.colorVal, self.colorVal, 0.7])
-                colors.append([self.colorVal, self.colorVal, self.colorVal, 0.8])
+                colors.append([1,0,0,0.7])
+                colors.append([0,1,0,0.7])
+                # colors.append([float(n) / float(self.nfaces), float(1 - n) / float(self.nfaces), float(m) / float(self.nfaces), 0.7])
+                # colors.append([float(n) / float(self.nfaces), float(1 - n) / float(self.nfaces), float(m) / float(self.nfaces), 0.8])
                 
                 # print([float(n) / self.nfaces, float(1 - n) / self.nfaces, float(m) / self.nfaces, 0.7])
                 # print([self.colorVal, float(1 - n) / self.nfaces, float(m) / self.nfaces, 0.7])
@@ -92,15 +103,16 @@ class Terrain(object):
         self.colorVal += 0.01
         faces = np.array(faces, dtype=np.uint32)
         colors = np.array(colors, dtype=np.float32)
-        print([self.colorVal, self.colorVal, self.colorVal, 0.7])
+        # print([self.colorVal, self.colorVal, self.colorVal, 0.7])
 
         self.m1.setMeshData(
             vertexes=verts, faces=faces, faceColors=colors
         )
         self.offset -= 0
         
-        print(self.colorVal)
+        # print(self.colorVal)
         # self.smoothness = (self.smoothness + 1) % 100 + 1
+        self.offset -= 0.18
     
     def start(self):
         """
@@ -115,10 +127,23 @@ class Terrain(object):
         """
         timer = QtCore.QTimer()
         timer.timeout.connect(self.update)
-        timer.start(1000)
+        timer.start(10)
         self.start()
         self.update()
             
 if __name__ == '__main__':
-    t = Terrain()
-    t.animation()
+    # t = Terrain()
+    # t.animation()
+    CHUNK_SIZE = 1024
+    FORMAT = pyaudio.paInt16
+    RATE = 80000
+
+    p = pyaudio.PyAudio()
+    output = p.open(format=FORMAT,
+                            channels=1,
+                            rate=RATE,
+                            output=True) # frames_per_buffer=CHUNK_SIZE
+    with open('Redbone.wav', 'rb') as fh:
+        while fh.tell() != 50000: # get the file-size from the os module
+            AUDIO_FRAME = fh.read(CHUNK_SIZE)
+            output.write(AUDIO_FRAME)

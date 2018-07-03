@@ -14,6 +14,7 @@ from pyqtgraph.Qt import QtCore, QtGui
 import struct
 import pyaudio
 import sys
+import wave
 
 
 class Terrain(object):
@@ -25,10 +26,12 @@ class Terrain(object):
         # setup the view window
         self.app = QtGui.QApplication(sys.argv)
         self.window = gl.GLViewWidget()
-        self.window.setWindowTitle('Terrain')
-        self.window.setGeometry(0, 110, 1920, 1080)
-        self.window.setCameraPosition(distance=30, elevation=12)
         self.window.show()
+        self.window.setWindowTitle('Terrain')
+        self.window.setCameraPosition(pos=(0,0,0), distance=200, elevation=30)
+        self.window.setGeometry(0, 0, 1280, 800)
+        self.window.pan(-70, -15, 0)
+        self.window.opts['viewport'] =  (0, 0, 2560, 1600)
 
         # constants and arrays
         self.nsteps = 1.3
@@ -37,7 +40,7 @@ class Terrain(object):
         self.xpoints = np.arange(-20, 20 + self.nsteps, self.nsteps)
         self.nfaces = len(self.ypoints)
 
-        self.RATE = 44100
+        self.RATE = 44100 # 44100
         self.CHUNK = len(self.xpoints) * len(self.ypoints)
 
         self.p = pyaudio.PyAudio()
@@ -67,7 +70,6 @@ class Terrain(object):
         self.window.addItem(self.mesh1)
 
     def mesh(self, offset=0, height=2.5, wf_data=None):
-
         if wf_data is not None:
             wf_data = struct.unpack(str(2 * self.CHUNK) + 'B', wf_data)
             wf_data = np.array(wf_data, dtype='b')[::2] + 128
@@ -82,7 +84,7 @@ class Terrain(object):
         colors = []
         verts = np.array([
             [
-                x, y, wf_data[xid][yid] * self.noise.noise2d(x=xid / 5 + offset, y=yid / 5 + offset)
+                x, y, wf_data[xid][yid] * self.noise.noise2d(x=xid / 10000 + offset, y=yid / 10000 + offset)
             ] for xid, x in enumerate(self.xpoints) for yid, y in enumerate(self.ypoints)
         ], dtype=np.float32)
 
@@ -100,10 +102,10 @@ class Terrain(object):
                     xid + yoff + self.nfaces + 1,
                 ])
                 colors.append([
-                    xid / self.nfaces, 1 - xid / self.nfaces, yid / self.nfaces, 0.7
+                    float(xid) / float(self.nfaces), float(1 - xid) / float(self.nfaces), float(yid) / float(self.nfaces), 0.7
                 ])
                 colors.append([
-                    xid / self.nfaces, 1 - xid / self.nfaces, yid / self.nfaces, 0.8
+                    float(1 - xid) / float(self.nfaces), float(xid) / float(self.nfaces), float(1 - yid) / float(self.nfaces), 0.7
                 ])
 
         faces = np.array(faces, dtype=np.uint32)
@@ -116,8 +118,8 @@ class Terrain(object):
         update the mesh and shift the noise each time
         """
 
-        wf_data = self.stream.read(self.CHUNK)
-
+        wf_data = self.stream.read(self.CHUNK, exception_on_overflow = False)
+        print(len(wf_data))
         verts, faces, colors = self.mesh(offset=self.offset, wf_data=wf_data)
         self.mesh1.setMeshData(vertexes=verts, faces=faces, faceColors=colors)
         self.offset -= 0.05
@@ -141,4 +143,26 @@ class Terrain(object):
 
 if __name__ == '__main__':
     t = Terrain()
+    
+    # CHUNK_SIZE = 1024
+    # FORMAT = pyaudio.paInt16
+    # RATE = 80000
+    # 
+    # p = pyaudio.PyAudio()
+    # output = p.open(format=FORMAT,
+    #                         channels=1,
+    #                         rate=RATE,
+    #                         input=True,
+    #                         output=True,
+    #                         frames_per_buffer=CHUNK_SIZE)
+    # 
+    # with open('Redbone.wav', 'rb') as fh:
+    #     while fh.tell() != 50000: # get the file-size from the os module
+    #         AUDIO_FRAME = fh.read(CHUNK_SIZE)
+    #         print(len(AUDIO_FRAME))
+    #         # verts, faces, colors = t.mesh(offset=t.offset, wf_data=AUDIO_FRAME)
+    #         # self.mesh1.setMeshData(vertexes=verts, faces=faces, faceColors=colors)
+    #         # self.offset -= 0.05
+    # 
+    #         output.write(AUDIO_FRAME)
     t.animation()
