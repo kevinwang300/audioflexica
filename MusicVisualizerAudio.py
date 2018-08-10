@@ -40,8 +40,9 @@ class Terrain(object):
         self.xpoints = np.arange(-20, 20 + self.nsteps, self.nsteps)
         self.nfaces = len(self.ypoints)
 
-        self.RATE = 44100 # 44100
+        self.RATE = 44100
         self.CHUNK = len(self.xpoints) * len(self.ypoints)
+        print(self.CHUNK)
 
         self.p = pyaudio.PyAudio()
         self.stream = self.p.open(
@@ -87,10 +88,12 @@ class Terrain(object):
                 x, y, wf_data[xid][yid] * self.noise.noise2d(x=xid / 10000 + offset, y=yid / 10000 + offset)
             ] for xid, x in enumerate(self.xpoints) for yid, y in enumerate(self.ypoints)
         ], dtype=np.float32)
-
+        
         for yid in range(self.nfaces - 1):
             yoff = yid * self.nfaces
             for xid in range(self.nfaces - 1):
+                faceNum = yid + xid
+                colorBase = (2 * self.nfaces) ** (float(1)/3)
                 faces.append([
                     xid + yoff,
                     xid + yoff + self.nfaces,
@@ -102,12 +105,11 @@ class Terrain(object):
                     xid + yoff + self.nfaces + 1,
                 ])
                 colors.append([
-                    float(xid) / float(self.nfaces), float(1 - xid) / float(self.nfaces), float(yid) / float(self.nfaces), 0.7
+                    float(faceNum / colorBase ** 2) / colorBase, float(faceNum / colorBase % colorBase) / colorBase, float(faceNum % colorBase) / colorBase, 0.7
                 ])
                 colors.append([
-                    float(1 - xid) / float(self.nfaces), float(xid) / float(self.nfaces), float(1 - yid) / float(self.nfaces), 0.7
+                    float(faceNum / colorBase ** 2) / colorBase, 1 - float(faceNum / colorBase % colorBase) / colorBase, float(faceNum % colorBase) / colorBase, 0.8                    
                 ])
-
         faces = np.array(faces, dtype=np.uint32)
         colors = np.array(colors, dtype=np.float32)
 
@@ -119,10 +121,9 @@ class Terrain(object):
         """
 
         wf_data = self.stream.read(self.CHUNK, exception_on_overflow = False)
-        print(len(wf_data))
         verts, faces, colors = self.mesh(offset=self.offset, wf_data=wf_data)
         self.mesh1.setMeshData(vertexes=verts, faces=faces, faceColors=colors)
-        self.offset -= 0.05
+        self.offset -= 0.18
 
     def start(self):
         """
@@ -143,26 +144,4 @@ class Terrain(object):
 
 if __name__ == '__main__':
     t = Terrain()
-    
-    # CHUNK_SIZE = 1024
-    # FORMAT = pyaudio.paInt16
-    # RATE = 80000
-    # 
-    # p = pyaudio.PyAudio()
-    # output = p.open(format=FORMAT,
-    #                         channels=1,
-    #                         rate=RATE,
-    #                         input=True,
-    #                         output=True,
-    #                         frames_per_buffer=CHUNK_SIZE)
-    # 
-    # with open('Redbone.wav', 'rb') as fh:
-    #     while fh.tell() != 50000: # get the file-size from the os module
-    #         AUDIO_FRAME = fh.read(CHUNK_SIZE)
-    #         print(len(AUDIO_FRAME))
-    #         # verts, faces, colors = t.mesh(offset=t.offset, wf_data=AUDIO_FRAME)
-    #         # self.mesh1.setMeshData(vertexes=verts, faces=faces, faceColors=colors)
-    #         # self.offset -= 0.05
-    # 
-    #         output.write(AUDIO_FRAME)
     t.animation()

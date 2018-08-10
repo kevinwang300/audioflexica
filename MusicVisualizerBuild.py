@@ -3,7 +3,6 @@ from pyqtgraph.Qt import QtCore, QtGui
 import pyqtgraph.opengl as gl
 import sys
 from opensimplex import OpenSimplex
-import wave
 import pyaudio
 
 class Terrain(object):
@@ -33,7 +32,7 @@ class Terrain(object):
         self.xpoints = range(-20, 22, self.nsteps)
         self.nfaces = len(self.ypoints)
         self.offset = 0
-        self.smoothness = 100
+        self.smoothness = 1000
         self.colorVal = 0
         
         # perlin noise object
@@ -69,11 +68,11 @@ class Terrain(object):
         self.m1.setGLOptions('additive')
         self.w.addItem(self.m1)
         
-        grid = gl.GLGridItem()
-        # grid.setSize(10, 10, 10)
-        grid.scale(2, 2, 2)
-        self.w.addItem(grid)
-        print(grid.size())
+        # grid = gl.GLGridItem()
+        # # grid.setSize(10, 10, 10)
+        # grid.scale(2, 2, 2)
+        # self.w.addItem(grid)
+        # print(grid.size())
         
     def update(self):
         """
@@ -108,7 +107,6 @@ class Terrain(object):
         self.m1.setMeshData(
             vertexes=verts, faces=faces, faceColors=colors
         )
-        self.offset -= 0
         
         # print(self.colorVal)
         # self.smoothness = (self.smoothness + 1) % 100 + 1
@@ -132,18 +130,21 @@ class Terrain(object):
         self.update()
             
 if __name__ == '__main__':
-    # t = Terrain()
-    # t.animation()
-    CHUNK_SIZE = 1024
-    FORMAT = pyaudio.paInt16
-    RATE = 80000
-
-    p = pyaudio.PyAudio()
-    output = p.open(format=FORMAT,
-                            channels=1,
-                            rate=RATE,
-                            output=True) # frames_per_buffer=CHUNK_SIZE
-    with open('Redbone.wav', 'rb') as fh:
-        while fh.tell() != 50000: # get the file-size from the os module
-            AUDIO_FRAME = fh.read(CHUNK_SIZE)
-            output.write(AUDIO_FRAME)
+    t = Terrain()
+    t.animation()
+    # CHUNK_SIZE = 1024
+    # FORMAT = pyaudio.paInt16
+    # RATE = 80000
+    # 
+    # p = pyaudio.PyAudio()
+    # output = p.open(format=FORMAT,
+    #                         channels=1,
+    #                         rate=RATE,
+    #                         input=True,
+    #                         output=True,
+    #                         frames_per_buffer=CHUNK_SIZE) # frames_per_buffer=CHUNK_SIZE
+    # with open('Redbone.wav', 'rb') as fh:
+    #     while fh.tell() != 50000: # get the file-size from the os module
+    #         AUDIO_FRAME = fh.read(CHUNK_SIZE)
+    #         print(len(AUDIO_FRAME))
+    #         output.write(AUDIO_FRAME)
