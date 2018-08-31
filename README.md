@@ -1,4 +1,4 @@
-# audioflexica
+# Audioflexica
 Welcome to Audioflexica! For these next four weeks, we are going to be exploring how to create a grid and how to make it react to sound!
 
 ### Week 1: Learn What PyQTGraph is and how to generate the graph!
