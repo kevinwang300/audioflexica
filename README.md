@@ -9,12 +9,12 @@ After downloading Anaconda, open the navigator and create a new environment and 
 [How to create an environment in Anaconda](https://uoa-eresearch.github.io/eresearch-cookbook/recipe/2014/11/20/conda/)
 
 Before we begin our project, we are going to need to download a few packages! Please run the following commands:
-`pip install --upgrade pip`
-`conda install -c anaconda numpy`
-`pip install opensimplex`
-`conda install -c anaconda pyopengl`
-`conda install -c anaconda pyqt`
-`conda install -c anaconda pyaudio`
+`pip install --upgrade pip`\
+`conda install -c anaconda numpy`\
+`pip install opensimplex`\
+`conda install -c anaconda pyopengl`\
+`conda install -c anaconda pyqt`\
+`conda install -c anaconda pyaudio`\
 
 Now that you have all of the required packages, it's time to begin development!
 
