@@ -14,7 +14,7 @@ Before we begin our project, we are going to need to download a few packages! Pl
 `pip install opensimplex`\
 `conda install -c anaconda pyopengl`\
 `conda install -c anaconda pyqt`\
-`conda install -c anaconda pyaudio`\
+`conda install -c anaconda pyaudio`
 
 Now that you have all of the required packages, it's time to begin development!
 
