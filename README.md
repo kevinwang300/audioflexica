@@ -8,7 +8,7 @@ After downloading Anaconda, open the navigator and create a new environment and 
 
 [How to create an environment in Anaconda](https://uoa-eresearch.github.io/eresearch-cookbook/recipe/2014/11/20/conda/)
 
-Before we begin our project, we are going to need to download a few packages! Please run the following commands:
+Before we begin our project, we are going to need to download a few packages! Please run the following commands:\
 `pip install --upgrade pip`\
 `conda install -c anaconda numpy`\
 `pip install opensimplex`\
