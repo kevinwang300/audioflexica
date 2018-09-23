@@ -1,6 +1,11 @@
 # Audioflexica
 Welcome to Audioflexica! For these next four weeks, we are going to be exploring how to create a grid and how to make it react to sound!
 
+### Setup
+For this project, we will be working on Anaconda Navigator! If you don't have Anaconda, you can click [here](https://www.anaconda.com/download/#macos)! We will be using Python 2.7 so download the 2.7 version!
+
+![Picture](/Users/dangdang98/Desktop)
+
 ### Week 1: Learn What PyQTGraph is and how to generate the graph!
 [PyQTGraph Documentation](http://pyqtgraph.org/documentation/)
 
