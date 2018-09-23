@@ -4,7 +4,12 @@ Welcome to Audioflexica! For these next four weeks, we are going to be exploring
 ### Setup
 For this project, we will be working on Anaconda Navigator! If you don't have Anaconda, you can click [here](https://www.anaconda.com/download/#macos)! We will be using Python 2.7 so download the 2.7 version!
 
-![Picture](/Users/dangdang98/Desktop)
+After downloading Anaconda, open the navigator and create a new environment and name it whatever you want. Make sure it's in Python 2.7.
+
+[How to create an environment in Anaconda](https://uoa-eresearch.github.io/eresearch-cookbook/recipe/2014/11/20/conda/)
+
+Before we begin our project, we are going to need to download a few packages! Please run the following commands:
+`conda install -c anaconda numpy`
 
 ### Week 1: Learn What PyQTGraph is and how to generate the graph!
 [PyQTGraph Documentation](http://pyqtgraph.org/documentation/)
