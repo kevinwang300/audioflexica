@@ -39,6 +39,7 @@ class Mesh(object):
         self.noise = OpenSimplex()
         self.offSet = 0
         self.audioData = None
+        self.mode = "nonaudio"
         
         verts = np.array([[x, y, 1.5 * self.noise.noise2d(i, j)] 
         for i, x in enumerate(range(-16, 16)) 
@@ -72,14 +73,14 @@ class Mesh(object):
         """
         self.audioData = self.stream.read(self.CHUNK, exception_on_overflow = False)
         
-        if self.audioData is not None:
+        if self.audioData is not None and self.mode=="audio":
             self.audioData = struct.unpack(str(2 * self.CHUNK) + 'B', self.audioData)
             self.audioData = np.array(self.audioData, dtype='b')[::2] + 128
             self.audioData = np.array(self.audioData, dtype='int32') - 128
             self.audioData = self.audioData * 0.04
             self.audioData = self.audioData.reshape(32, 32)
         else:
-            self.audioData = np.array([1] * 1024)
+            self.audioData = np.array([1.5] * 1024)
             self.audioData = self.audioData.reshape(32, 32)
         
         verts = np.array([[x, y, self.audioData[i][j] * self.noise.noise2d(i + self.offSet, j + self.offSet)] 
@@ -120,7 +121,12 @@ class Mesh(object):
         timer = QtCore.QTimer()
         timer.timeout.connect(self.update)
         timer.start(10)
-        self.start()
+        
+        # audio mode switch
+        
+        # self.mode = "audio"
+        
+        self.start()    
         self.update()
         
 
