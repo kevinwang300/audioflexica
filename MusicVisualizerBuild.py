@@ -14,10 +14,7 @@ class Terrain(object):
         # setup the view window
         self.app = QtGui.QApplication(sys.argv)
         self.w = gl.GLViewWidget()
-        # self.w.setGeometry(0, 0, 1280, 800)
         print(1, self.w.width(), self.w.height())
-        # self.w.resizeGL(1080, 720)
-        # self.w.resizeGL(2000, 1100)
         self.w.show()
         self.w.setWindowTitle('Terrain')
         self.w.setCameraPosition(pos=(0,0,0), distance=200, elevation=30)
@@ -110,7 +107,7 @@ class Terrain(object):
         
         # print(self.colorVal)
         # self.smoothness = (self.smoothness + 1) % 100 + 1
-        self.offset -= 0.18
+        # self.offset -= 0.18
     
     def start(self):
         """

@@ -1,0 +1,28 @@
+import numpy as np
+from pyqtgraph.Qt import QtCore, QtGui
+import pyqtgraph.opengl as gl
+import sys
+
+class Mesh(object):
+    def __init__(self):
+        """
+        Create the view graphics and window
+        """
+        
+        #set up the window
+        self.app = QtGui.QApplication(sys.argv)
+        self.view = gl.GLViewWidget()
+        self.view.show()
+        self.view.setWindowTitle("Mesh")
+    
+    def start(self):
+        """
+        Start off the screen
+        """
+        if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
+            QtGui.QApplication.instance().exec_()
+
+if __name__ == '__main__':
+    mesh = Mesh()
+    mesh.start()
+        

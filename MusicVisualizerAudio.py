@@ -42,7 +42,6 @@ class Terrain(object):
 
         self.RATE = 44100
         self.CHUNK = len(self.xpoints) * len(self.ypoints)
-        print(self.CHUNK)
 
         self.p = pyaudio.PyAudio()
         self.stream = self.p.open(
@@ -75,7 +74,7 @@ class Terrain(object):
             wf_data = struct.unpack(str(2 * self.CHUNK) + 'B', wf_data)
             wf_data = np.array(wf_data, dtype='b')[::2] + 128
             wf_data = np.array(wf_data, dtype='int32') - 128
-            wf_data = wf_data * 0.04
+            wf_data = wf_data * 0.1
             wf_data = wf_data.reshape((len(self.xpoints), len(self.ypoints)))
         else:
             wf_data = np.array([1] * 1024)
