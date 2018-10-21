@@ -3,6 +3,9 @@ from pyqtgraph.Qt import QtCore, QtGui
 import pyqtgraph.opengl as gl
 import sys
 from opensimplex import OpenSimplex
+import pyaudio
+import struct
+import wave
 
 class Mesh(object):
     def __init__(self):
@@ -20,8 +23,22 @@ class Mesh(object):
         # self.view.setGeometry(0, 0, 1280, 800)
         # self.view.opts['viewport'] = (0, 0, 2560, 1600)
         
+        self.RATE = 24000
+        self.CHUNK = 1024
+        
+        self.p = pyaudio.PyAudio()
+        self.stream = self.p.open(
+            format=pyaudio.paInt16,
+            channels=1,
+            rate=self.RATE,
+            input=True,
+            output=True,
+            frames_per_buffer=self.CHUNK
+        )
+        
         self.noise = OpenSimplex()
         self.offSet = 0
+        self.audioData = None
         
         verts = np.array([[x, y, 1.5 * self.noise.noise2d(i, j)] 
         for i, x in enumerate(range(-16, 16)) 
@@ -53,8 +70,19 @@ class Mesh(object):
         """
         Updates the grid
         """
+        self.audioData = self.stream.read(self.CHUNK, exception_on_overflow = False)
         
-        verts = np.array([[x, y, 1.5 * self.noise.noise2d(i + self.offSet, j + self.offSet)] 
+        if self.audioData is not None:
+            self.audioData = struct.unpack(str(2 * self.CHUNK) + 'B', self.audioData)
+            self.audioData = np.array(self.audioData, dtype='b')[::2] + 128
+            self.audioData = np.array(self.audioData, dtype='int32') - 128
+            self.audioData = self.audioData * 0.04
+            self.audioData = self.audioData.reshape(32, 32)
+        else:
+            self.audioData = np.array([1] * 1024)
+            self.audioData = self.audioData.reshape(32, 32)
+        
+        verts = np.array([[x, y, self.audioData[i][j] * self.noise.noise2d(i + self.offSet, j + self.offSet)] 
         for i, x in enumerate(range(-16, 16)) 
         for j, y in enumerate(range(-16, 16))], dtype=np.float32)
         
